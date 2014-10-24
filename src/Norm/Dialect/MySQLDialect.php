@@ -174,7 +174,7 @@ class MySQLDialect extends SQLDialect
         if ($field == '$id') {
             $field = 'id';
         } elseif (strlen($field) > 0 && $field[0] === '$') {
-            $field = 'h_'.substr($field, 1);
+            $field = '_'.substr($field, 1);
         }
 
         $operator = '=';
