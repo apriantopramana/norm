@@ -185,6 +185,7 @@ class PDOCursor implements ICursor
                 $sql .= ' OFFSET '.$this->skip;
             }
 
+            // var_dump($sql);
             $this->statement = $this->collection->connection->getRaw()->prepare($sql);
 
             $this->statement->execute($data);

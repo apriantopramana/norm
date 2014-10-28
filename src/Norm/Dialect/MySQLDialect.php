@@ -206,6 +206,8 @@ class MySQLDialect extends SQLDialect
                     throw new Exception('Operator regex is not supported to query.');
                     // return array($field, array('$regex', new \MongoRegex($value)));
                 case 'in':
+                    $operator = 'IN';
+                    break;
                 case 'nin':
                     throw new Exception('Operator regex is not supported to query.');
                     // $operator = '$'.$splitted[1];
@@ -218,14 +220,30 @@ class MySQLDialect extends SQLDialect
             }
         }
 
-        $fk = 'f'.$this->expressionCounter++;
-        $data[$fk] = $fValue;
-        $sql = $field.' '.$operator.' :'.$fk;
+        if ($operator == 'IN') {
+            $fgroup = array();
+            foreach ($value as $k => $v) {
+                $this->expressionCounter++;
+                $data['f'.$this->expressionCounter] = $v;
+                $fgroup[] = ':f'.$this->expressionCounter;
+            }
 
-        if (empty($fValue)) {
-            $sql = '('.$sql.' OR '.$field.' is null)';
+            $sql = $field . ' ' . $operator . ' ('.implode(', ', $fgroup).')';
+            $this->expressionCounter++;
+
+        } else {
+            $fk = 'f'.$this->expressionCounter++;
+            $data[$fk] = $fValue;
+            $sql = $field.' '.$operator.' :'.$fk;
+
+            if (empty($fValue)) {
+                $sql = '('.$sql.' OR '.$field.' is null)';
+            }
         }
 
+        // var_dump($sql);
+        // exit();
+        
         return $sql;
     }
 }
